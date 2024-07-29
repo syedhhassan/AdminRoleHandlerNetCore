@@ -3,6 +3,8 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <div class="d-grid gap-2 mx-auto col-4">
+        <a class="btn btn-outline-primary" asp-controller="Account" asp-action="SignUp">Sign Up</a>
+        <a class="btn btn-outline-primary" asp-controller="Account" asp-action="SignIn">Sign In</a>
+    </div>
 </div>

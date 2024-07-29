@@ -1,0 +1,99 @@
+﻿@model Admin.Core.Models.UserModel;
+
+<h2 class="text-center">Sign in</h2>
+<div class="container col-6">
+    @using (Html.BeginForm("SignIn", "Account", FormMethod.Post, new { @id = "SignIn", @class = "form-control bg-light shadow-lg" }))
+    {
+        <div class="row mb-3 mt-3">
+            <label class="col-2"><strong>Email<span class="text-danger">*</span></strong></label>
+            <div class="col-10">
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @id = "Email", maxlength = 50 })
+                <label class="error text-danger" for="Email"></label>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label class="col-2"><strong>Password<span class="text-danger">*</span></strong></label>
+            <div class="col-10">
+                @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @id = "Password", @type = "password" })
+                <label class="error text-danger" for="Password"></label>
+                @Html.CheckBox("ShowPass", new { @class = "form-check-input", @id = "ShowPass" })
+                <span class="form-check-label">Show password</span>
+            </div>
+        </div>
+        <div class="text-center col-12">
+            <div class="form-group mb-2">
+                <button type="submit" class="btn btn-primary">Sign In</button>
+            </div>
+        </div>
+        <div class="text-center mb-3">
+            <label class="text-sm-center">Don't have an account?</label>
+            <a asp-controller="Account" asp-action="SignUp" class="link">Sign Up</a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var message = '@TempData["ToastrMessage"]';
+            var type = '@TempData["ToastrType"]';
+            if (message !== "") {
+                toastr.options = {
+                    progressBar: true,
+                    positionClass: 'toast-top-right'
+                };
+                toastr[type](message);
+            }
+        });
+
+        $('#ShowPass').on('click', function () {
+            var x = document.getElementById("Password");
+            if (x.type === "password") {
+                x.type = "text";
+            }
+            else {
+                x.type = "password";
+            }
+        });
+
+        $("#SignIn").validate({
+            rules: {
+                UserName: {
+                    required: true
+                },
+                Password: {
+                    required: true
+                }
+            },
+            messages: {
+                UserName: {
+                    required: "User name is a required field",
+                },
+                Password: {
+                    required: "Salary is a required field"
+                }
+            }
+        });
+
+        $("#SignIn").validate({
+            rules: {
+                Email: {
+                    required: true
+                },
+                Password: {
+                    required: true
+                }
+            },
+            messages: {
+                Email: {
+                    required: "User name is a required field",
+                },
+                Password: {
+                    required: "Salary is a required field"
+                }
+            }
+        });
+    </script>
+
+    <partial name="_ValidationScriptsPartial" />
+}

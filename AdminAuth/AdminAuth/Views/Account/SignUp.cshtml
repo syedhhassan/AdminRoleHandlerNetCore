@@ -3,61 +3,150 @@
     @using (Html.BeginForm("SignUp", "Account", FormMethod.Post, new { @id = "SignUp", @class = "form-control bg-light shadow-lg" }))
     {
         <div class="row mb-3 mt-3">
-            <label class="col-2"><strong>Name<span class="text-danger">*</span></strong></label>
-            <div class="col-10">
-                @Html.TextBox("Name", "", new { @class = "form-control", @id = "Name", @oninput = "this.value=(this.value.match('[A-Za-z0-9_]+'))", maxlength = 50 })
+            <label class="col-2 ml-2"><strong>Name<span class="text-danger">*</span></strong></label>
+            <div class="col-10 mr-2">
+                @Html.TextBox("Name", "", new { @class = "form-control", @id = "Name", @oninput = "this.value=(this.value.match('[A-Z a-z]+'))", maxlength = 50 })
                 <label class="error text-danger" for="Name"></label>
             </div>            
         </div>
         <div class="row mb-3">
-            <label class="col-2"><strong>Email<span class="text-danger">*</span></strong></label>
-            <div class="col-10">
-                @Html.TextBox("Email", "", new { @class = "form-control", @id = "Email", @oninput = "this.value=(this.value.match('[A-Za-z0-9_]+'))", maxlength = 50 })
+            <label class="col-2 ml-2"><strong>Email<span class="text-danger">*</span></strong></label>
+            <div class="col-10 mr-2">
+                @Html.TextBox("Email", "", new { @class = "form-control", @id = "Email", maxlength = 50 })
                 <label class="error text-danger" for="Email"></label>
             </div>            
         </div>
         <div class="row mb-3">
-            <label class="col-2"><strong>Password<span class="text-danger">*</span></strong></label>
-            <div class="col-10">
-                @Html.TextBox("Password", "", new { @class = "form-control", @id = "Password", @oninput = "this.value=(this.value.match('[A-Za-z0-9_]+'))", maxlength = 50 })
+            <label class="col-2 ml-2"><strong>Password<span class="text-danger">*</span></strong></label>
+            <div class="col-10 mr-2">
+                @Html.TextBox("Password", "", new { @class = "form-control", @id = "Password", @oninput = "this.value=(this.value.match('[A-Za-z0-9_]+'))", maxlength = 50, @type = "password" })
+                @Html.CheckBox("ShowPass", new { @class = "form-check-input", @id = "ShowPass" })
+                <span class="form-check-label">Show password</span>
+                <br />
                 <label class="error text-danger" for="Password"></label>
             </div>            
         </div>
         <div class="row mb-3">
-            <label class="col-2"><strong>Confirm Password<span class="text-danger">*</span></strong></label>
-            <div class="col-10">
-                @Html.TextBox("CPassword", "", new { @class = "form-control", @id = "CPassword", @oninput = "this.value=(this.value.match('[A-Za-z0-9_]+'))", maxlength = 50 })
+            <label class="col-2 ml-2"><strong>Confirm Password<span class="text-danger">*</span></strong></label>
+            <div class="col-10 mr-2">
+                @Html.TextBox("CPassword", "", new { @class = "form-control", @id = "CPassword", @oninput = "this.value=(this.value.match('[A-Za-z0-9_]+'))", maxlength = 50, @type = "password" })
                 <label class="error text-danger" for="CPassword"></label>
             </div>            
         </div>
         <div class="row mb-3">
-            <label class="col-2"><strong>Phone<span class="text-danger">*</span></strong></label>
-            <div class="col-10">
-                @Html.TextBox("Phone", "", new { @class = "form-control", @id = "Phone", @oninput = "this.value=(this.value.match('[A-Za-z0-9_]+'))", maxlength = 50 })
+            <label class="col-2 ml-2"><strong>Phone<span class="text-danger">*</span></strong></label>
+            <div class="col-10 mr-2">
+                @Html.TextBox("Phone", "", new { @class = "form-control", @id = "Phone", @oninput = "this.value=(this.value.match('[0-9-]+'))", maxlength = 12 })
                 <label class="error text-danger" for="Phone"></label>
             </div>            
         </div>
         <div class="row mb-3">
-            <label class="col-2"><strong>Roles<span class="text-danger">*</span></strong></label>
-            <div class="col-10">
+            <label class="col-2 ml-2"><strong>Roles<span class="text-danger">*</span></strong></label>
+            <div class="col-10 mr-2">
                 @Html.DropDownList("Role", new SelectList(GetRoles(), "Value", "Text"), "Select", new { id = "Role", @class = "form-control" })
                 <label class="error text-danger" for="Role"></label>
+            </div>
+        </div>
+        <div id="ManagerName" style="display:none">
+            <div class="row mb-3">
+                <label class="col-2"><strong>Manager<span class="text-danger">*</span></strong></label>
+                <div class="col-10">
+                    @Html.DropDownList("Manager", new SelectList((IEnumerable<string>)TempData["Managers"]), "Select", new { id = "Role", @class = "form-control" })
+                    <label class="error text-danger" for="Role"></label>
+                </div>
             </div>
         </div>
         <div class="form-group text-center mt-2 mb-3">
             <button type="submit" class="btn btn-primary col-3 text-center" id="submit">Sign Up</button>
         </div>
+        <div class="text-center mb-3">
+            <label class="text-sm-center">Already a member?</label>
+            <a asp-controller="Account" asp-action="SignIn" class="link">Log In</a>
+        </div>
     }
 </div>
-
+    
     @functions {
-    public static List<SelectListItem> GetRoles()
-    {
-        return new List<SelectListItem>
+        public static List<SelectListItem> GetRoles()
         {
-            new SelectListItem { Value = "Admin", Text = "Admin" },
-            new SelectListItem { Value = "Manager", Text = "Manager" },
-            new SelectListItem { Value = "Team Member", Text = "Team Member" },
-        };
+            return new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Admin", Text = "Admin" },
+                new SelectListItem { Value = "Manager", Text = "Manager" },
+                new SelectListItem { Value = "Team Member", Text = "Team Member" },
+            };
+        }
     }
-    }
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#Role').on('click', function () {
+                if ($('#Role').val() == "Team Member") {
+                    $('#ManagerName').css("display", "block")
+                }
+                else {
+                    $('#ManagerName').css("display", "none")
+                }
+            });
+
+            $('#ShowPass').on('click', function () {
+                var x = document.getElementById("Password");
+                if (x.type === "password") {
+                    x.type = "text";
+                }
+                else {
+                    x.type = "password";
+                }
+            });
+
+            $("#SignUp").validate({
+                rules: {
+                    Name: {
+                        required: true
+                    },
+                    Email: {
+                        required: true,
+                        email: true
+                    },
+                    Role: {
+                        required: true
+                    },
+                    Manager: {
+                        required: true
+                    },
+                    Password: {
+                        required: true
+                    },
+                    CPassword: {
+                        required: true,
+                        equalTo: "#Password"
+                    }
+                },
+                messages: {
+                    Name: {
+                        required: "Name is a required field",
+                    },
+                    Email: {
+                        required: "Email is a required field",
+                        email: "Please enter a valid email"
+                    },
+                    Role: {
+                        required: "Select a role"
+                    },
+                    Manager: {
+                        required: "Select your manager"
+                    },
+                    Password: {
+                        required: "Password is a required field"
+                    },
+                    CPassword: {
+                        required: "Re-enter your password",
+                        equalTo: "Passwords didn't match"
+                    }
+                }
+            });
+        });
+
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+}
