@@ -1,4 +1,6 @@
 ﻿@model List<Admin.Core.Models.UserModel>
+<h2>Welcome @Model[0].Name!</h2>
+<h5><img src=" https://cdn-icons-png.flaticon.com/512/1769/1769041.png" alt="" width="35" height="35"/> Employees under you</h5>
 <div class="row">
     @foreach (var input in Model)
     {
@@ -17,7 +19,6 @@
                 <div class="card-text"><strong>@input.Name</strong></div>
                 <div class="card-text">@input.Email</div>
                 <div class="card-text">@input.Phone</div>
-                <div class="card-text">@input.Role</div>
             </div>
         </div>
         <div class="col-1"></div>

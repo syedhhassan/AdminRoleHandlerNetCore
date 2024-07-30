@@ -35,38 +35,12 @@
                     </ul>
                     @if (ViewContext.RouteData.Values["action"].ToString() != "SignIn" && ViewContext.RouteData.Values["action"].ToString() != "SignUp" && ViewContext.RouteData.Values["action"].ToString() != "Index" && ViewContext.RouteData.Values["action"].ToString() != "Privacy")
                     {
-                        <div class="dropdown">
-                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
-                                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"></path>
-                                </svg>
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li><a class="dropdown-item" asp-controller="Account" asp-action="Logout">Log Out</a></li>
-                            </ul>
-                        </div>
-
-
-@*                             <li class="nav-item position-absolute top-0 end-0">
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-secondary dropdown-toggle" role="button" data-bs-toggle="dropdown" data-bs-target="#dropdowmmenu" aria-expanded="false">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
-                                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"></path>
-                                    </svg>
-                                </button>
-                                <ul class="dropdown-menu" id="dropdowmmenu">
-                                    <li class="dropdown-item">Hi</li>
-                                    <li class="dropdown-item">
-                                        <a class="dropdown-item" asp-controller="Account" asp-action="Logout" asp-area="">
-                                            <button class="btn btn-danger">
-                                                Logout
-                                            </button>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li> *@
-                    }                    
+                        <li class="nav-item" id="Logout">
+                            <a class="nav-link text-dark position-absolute top-0 end-0">
+                                <img src="https://www.spanplan.com/images/exit.png" alt="" style="cursor:pointer;">
+                            </a>
+                        </li>
+                    }
                 </div>
             </div>
         </nav>
@@ -94,6 +68,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="~/lib/jquery-mask/dist/jquery.mask.js"></script>
     <script src="~/lib/jquery-mask/dist/jquery.mask.min.js"></script>
+    <script>
+        $(document).on('click', '#Logout', function () {
+            return confirm('Are you sure you to logout?');
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

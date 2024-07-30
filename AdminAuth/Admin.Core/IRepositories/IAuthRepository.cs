@@ -10,9 +10,12 @@ namespace Admin.Core.IRepositories
     public interface IAuthRepository
     {
         public bool SignUp(UserModel user);
-        public UserModel GetCreds(string Email);
-        
+
+        public bool CheckDuplicate(UserModel user);
+
         public List<string> GetManagers();
+
+        public UserModel GetCreds(string Email);        
 
         public List<UserModel> GetEmployeesByManager(string Email);
 

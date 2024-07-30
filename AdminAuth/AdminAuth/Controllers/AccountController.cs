@@ -12,25 +12,59 @@ namespace AdminAuth.Controllers
         {
             _authService = authService;
         }
+        #region Sign Up
+        /// <summary>
+        /// Sign Up
+        /// </summary>
+        /// <returns></returns>
         public IActionResult SignUp()
         {
             HttpContext.Session.Clear();
             TempData["Managers"] = _authService.GetManagers();
             return View();
         }
+        #endregion
 
+        #region Sign Up Post Action
+        /// <summary>
+        /// Sign Up Post Action
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult SignUp(UserModel user)
         {
-            _authService.SignUp(user);
-            return RedirectToAction("Index", "Home");
+            if (_authService.CheckDuplicate(user))
+            {
+                _authService.SignUp(user);
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                TempData["ToastrMessage"] = "Email already exists. Please Sign In";
+                TempData["ToastrType"] = "warning";
+                return View(user);
+            }           
         }
+        #endregion
 
+        #region Sign In
+        /// <summary>
+        /// Sign In
+        /// </summary>
+        /// <returns></returns>
         public IActionResult SignIn()
         {
             return View();
         }
+        #endregion
 
+        #region Sign In Post Action
+        /// <summary>
+        /// Sign In Post Action
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult SignIn(UserModel user)
         {
@@ -65,7 +99,13 @@ namespace AdminAuth.Controllers
                 return View();
             }
         }
+        #endregion
 
+        #region Dashboard for Admin
+        /// <summary>
+        /// Dashboard for Admin
+        /// </summary>
+        /// <returns></returns>
         public IActionResult AdminDashboard()
         {
             var sessionemail = HttpContext.Session.GetString("Email");
@@ -84,7 +124,13 @@ namespace AdminAuth.Controllers
                 return RedirectToAction("SignIn");
             }
         }
+        #endregion
 
+        #region Dashboard for Manager
+        /// <summary>
+        /// Dashboard for Manager
+        /// </summary>
+        /// <returns></returns>
         public IActionResult ManagerDashboard()
         {
             var sessionemail = HttpContext.Session.GetString("Email");
@@ -103,7 +149,13 @@ namespace AdminAuth.Controllers
                 return RedirectToAction("SignIn");
             }
         }
+        #endregion
 
+        #region Dashboard for User
+        /// <summary>
+        /// Dashboard for User
+        /// </summary>
+        /// <returns></returns>
         public IActionResult UserDashboard()
         {
             var sessionemail = HttpContext.Session.GetString("Email");
@@ -122,14 +174,28 @@ namespace AdminAuth.Controllers
                 return RedirectToAction("SignIn");
             }
         }
+        #endregion
 
+        #region Edit Employee
+        /// <summary>
+        /// Edit Employee
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
         public IActionResult EditEmployee(string Email)
         {
             TempData["Managers"] = _authService.GetManagers();
             UserModel user = _authService.EditEmployee(Email);
             return View("EditEmployee", user);
         }
+        #endregion
 
+        #region Update Employee Post Action
+        /// <summary>
+        /// Update Employee Post Action
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult Update(UserModel user)
         {
@@ -159,11 +225,20 @@ namespace AdminAuth.Controllers
                 return RedirectToAction("EditEmployee");
             }
         }
+        #endregion
 
+        #region Log out
+        /// <summary>
+        /// Log out
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
+            TempData["ToastrMessage"] = "Logged out successfully!";
+            TempData["ToastrType"] = "success";
             return RedirectToAction("Index", "Home");
         }
+        #endregion
     }
 }

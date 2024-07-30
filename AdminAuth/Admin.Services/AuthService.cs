@@ -20,6 +20,12 @@ namespace Admin.Services
             _authRepository = authRepository;
         }
 
+        #region Sign Up
+        /// <summary>
+        /// Sign Up
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public bool SignUp(UserModel user)
             {
             byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
@@ -27,6 +33,12 @@ namespace Admin.Services
             user.Salt = salt;
             user.PasswordHash = hashed;
             return _authRepository.SignUp(user);
+        }
+        #endregion
+
+        public bool CheckDuplicate(UserModel user)
+        {
+            return _authRepository.CheckDuplicate(user);
         }
 
         public List<string> GetManagers()

@@ -11,13 +11,15 @@ namespace Admin.Core.IServices
     {
         public bool SignUp(UserModel user);
 
+        public bool CheckDuplicate(UserModel user);
+
+        public List<string> GetManagers();
+
         public UserModel GetEmployeeByEmail(string Email);
 
         public List<UserModel> GetEmployeesForAdmin(string Email);
 
         public List<UserModel> GetEmployeesByManager(string Email);
-
-        public List<string> GetManagers();
 
         public string SignIn(UserModel user);
 

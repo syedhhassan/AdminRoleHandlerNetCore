@@ -16,7 +16,13 @@ namespace Admin.Resources
     public class AuthRepository : IAuthRepository
     {
         public string connectionString = "Server=13.127.44.211;Database=Express990_TraningDB;User Id=Express_dev_user;Password=Dev@2024;";
-        
+
+        #region Sign Up
+        /// <summary>
+        /// Sign Up
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public bool SignUp(UserModel user)
         {           
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -34,7 +40,39 @@ namespace Admin.Resources
             }
             return true;
         }
+        #endregion
 
+        #region Check for duplicate email for sign up
+        /// <summary>
+        /// Check for duplicate email for sign up
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public bool CheckDuplicate(UserModel user)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    int count = connection.Execute(SQLConstants.check_duplicate_query, new { EMAIL = user.Email });
+                    return count == 0;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    return false;
+                }
+            }
+            return true;
+        }
+        #endregion
+
+        #region Get Managers for Sign Up dropdown
+        /// <summary>
+        /// Get Managers for Sign Up dropdown
+        /// </summary>
+        /// <returns></returns>
         public List<string> GetManagers()
         {
             List<string> result = new List<string>();
@@ -52,7 +90,14 @@ namespace Admin.Resources
             }
             return result;
         }
+        #endregion
 
+        #region Getting credentials for signing in
+        /// <summary>
+        /// Getting credentials for signing in
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
         public UserModel GetCreds(string Email)
         {
             UserModel user = new UserModel();
@@ -73,7 +118,14 @@ namespace Admin.Resources
                 return user;
             }
         }
+        #endregion
 
+        #region Getting employees by their manager
+        /// <summary>
+        /// Getting employees by their manager
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
         public List<UserModel> GetEmployeesByManager(string Email)
         {
             List<UserModel> users = new List<UserModel>();
@@ -97,7 +149,14 @@ namespace Admin.Resources
             }
             return users;
         }
+        #endregion
 
+        #region Getting all employees for admin
+        /// <summary>
+        /// Getting all employees for admin
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
         public List<UserModel> GetEmployeesForAdmin(string Email)
         {
             List<UserModel> users = new List<UserModel>();
@@ -121,7 +180,14 @@ namespace Admin.Resources
             }
             return users;
         }
+        #endregion
 
+        #region Getting an employee by Email
+        /// <summary>
+        /// Getting an employee by Email
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
         public UserModel GetEmployeeByEmail(string Email)
         {
             UserModel user = new UserModel();
@@ -139,7 +205,14 @@ namespace Admin.Resources
             }
             return user;
         }
+        #endregion
 
+        #region Getting an employee's details for editing
+        /// <summary>
+        /// Getting an employee's details for editing
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
         public UserModel EditEmployee(string Email)
             {
             UserModel userModel = new UserModel();
@@ -162,7 +235,14 @@ namespace Admin.Resources
             }
             return userModel;
         }
+        #endregion
 
+        #region Updating an employee
+        /// <summary>
+        /// Updating an employee
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public bool UpdateEmployee(UserModel user)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -180,5 +260,7 @@ namespace Admin.Resources
             }
             return true;
         }
+        #endregion
+
     }
 }
