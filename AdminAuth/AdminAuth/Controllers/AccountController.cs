@@ -35,21 +35,21 @@ namespace AdminAuth.Controllers
         public IActionResult SignIn(UserModel user)
         {
             var value = _authService.SignIn(user);
-            if (value != 0)
+            if (value != "_")
             {
                 HttpContext.Session.SetString("Email", user.Email);
-
-                if (value == 1)
+                HttpContext.Session.SetString("Role", value);
+                if (value == "Admin")
                 {
-                    return RedirectToAction("Dashboard");
+                    return RedirectToAction("AdminDashboard");
                 }
-                else if (value == 2)
+                else if (value == "Manager")
                 {
                     return RedirectToAction("ManagerDashboard");
                 }
-                else if (value == 3)
+                else if (value == "Team Member")
                 {
-                    return RedirectToAction("MemberDashboard");
+                    return RedirectToAction("UserDashboard");
                 }
                 else
                 {
@@ -66,12 +66,53 @@ namespace AdminAuth.Controllers
             }
         }
 
+        public IActionResult AdminDashboard()
+        {
+            var sessionemail = HttpContext.Session.GetString("Email");
+            var sessionrole = HttpContext.Session.GetString("Role");
+            if (sessionemail != null && sessionrole == "Admin")
+            {
+                TempData["ToastrMessage"] = "Hi Admin!";
+                TempData["ToastrType"] = "success";
+                List<UserModel> users = _authService.GetEmployeesForAdmin(sessionemail);
+                return View(users);
+            }
+            else
+            {
+                TempData["ToastrMessage"] = "Sign in as Admin!";
+                TempData["ToastrType"] = "warning";
+                return RedirectToAction("SignIn");
+            }
+        }
+
         public IActionResult ManagerDashboard()
         {
-            var sessiondata = HttpContext.Session.GetString("Email");
-            if (sessiondata != null)
+            var sessionemail = HttpContext.Session.GetString("Email");
+            var sessionrole = HttpContext.Session.GetString("Role");
+            if (sessionemail != null && sessionrole == "Manager")
             {
-                List<UserModel> users = _authService.GetEmployeesByManager(sessiondata);
+                TempData["ToastrMessage"] = "Hi Manager!";
+                TempData["ToastrType"] = "success";
+                List<UserModel> users = _authService.GetEmployeesByManager(sessionemail);
+                return View(users);
+            }
+            else
+            {
+                TempData["ToastrMessage"] = "Sign in as Manager!";
+                TempData["ToastrType"] = "warning";
+                return RedirectToAction("SignIn");
+            }
+        }
+
+        public IActionResult UserDashboard()
+        {
+            var sessionemail = HttpContext.Session.GetString("Email");
+            var sessionrole = HttpContext.Session.GetString("Role");
+            if (sessionemail != null && sessionrole == "Team Member")
+            {
+                TempData["ToastrMessage"] = "Hi User!";
+                TempData["ToastrType"] = "success";
+                UserModel users = _authService.GetEmployeeByEmail(sessionemail);
                 return View(users);
             }
             else
@@ -79,6 +120,43 @@ namespace AdminAuth.Controllers
                 TempData["ToastrMessage"] = "Sign in first!";
                 TempData["ToastrType"] = "warning";
                 return RedirectToAction("SignIn");
+            }
+        }
+
+        public IActionResult EditEmployee(string Email)
+        {
+            TempData["Managers"] = _authService.GetManagers();
+            UserModel user = _authService.EditEmployee(Email);
+            return View("EditEmployee", user);
+        }
+
+        [HttpPost]
+        public IActionResult Update(UserModel user)
+        {
+            var sessionrole = HttpContext.Session.GetString("Role");
+
+            if (_authService.UpdateEmployee(user))
+            {
+                TempData["ToastrMessage"] = $"Employee {user.Name} updated successfully!";
+                TempData["ToastrType"] = "success";
+                if (sessionrole == "Admin")
+                {
+                    return RedirectToAction("AdminDashboard");
+                }
+                else if (sessionrole == "Manager")
+                {
+                    return RedirectToAction("ManagerDashboard");
+                }
+                else
+                {
+                    return RedirectToAction("UserDashboard");
+                }
+            }
+            else
+            {
+                TempData["ToastrMessage"] = "Failed to update employee.";
+                TempData["ToastrType"] = "error";
+                return RedirectToAction("EditEmployee");
             }
         }
 

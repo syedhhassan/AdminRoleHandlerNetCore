@@ -11,10 +11,19 @@ namespace Admin.Core.IServices
     {
         public bool SignUp(UserModel user);
 
+        public UserModel GetEmployeeByEmail(string Email);
+
+        public List<UserModel> GetEmployeesForAdmin(string Email);
+
         public List<UserModel> GetEmployeesByManager(string Email);
 
         public List<string> GetManagers();
 
-        public int SignIn(UserModel user);
+        public string SignIn(UserModel user);
+
+        public UserModel EditEmployee(string Email);
+
+        public bool UpdateEmployee(UserModel user);
+
     }
 }

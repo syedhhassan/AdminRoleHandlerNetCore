@@ -16,6 +16,7 @@ namespace Admin.Resources
     public class AuthRepository : IAuthRepository
     {
         public string connectionString = "Server=13.127.44.211;Database=Express990_TraningDB;User Id=Express_dev_user;Password=Dev@2024;";
+        
         public bool SignUp(UserModel user)
         {           
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -23,7 +24,7 @@ namespace Admin.Resources
                 try
                 {
                     connection.Open();
-                    connection.Execute(SQLConstants.sign_up_query, new { NAME = user.Name, EMAIL = user.Email, PASSWORDHASH = user.PasswordHash, SALT = user.Salt, PHONE = user.Phone, ROLEID = user.RoleId, MANAGER = user.Manager });
+                    connection.Execute(SQLConstants.sign_up_query, new { NAME = user.Name, EMAIL = user.Email, PASSWORDHASH = user.PasswordHash, SALT = user.Salt, PHONE = user.Phone, ROLE = user.Role, MANAGER = user.Manager });
                 }
                 catch (Exception ex)
                 {
@@ -63,7 +64,7 @@ namespace Admin.Resources
                     var creds = connection.QuerySingle(SQLConstants.get_creds_query, new { EMAIL = Email });
                     user.Salt = creds.SALT;
                     user.PasswordHash = creds.PASSWORDHASH;
-                    user.RoleId = Convert.ToString(creds.ROLEID);
+                    user.Role = Convert.ToString(creds.ROLE);
                 }
                 catch (Exception ex)
                 {
@@ -105,7 +106,7 @@ namespace Admin.Resources
                 try
                 {
                     connection.Open();
-                    UserModel user = connection.QuerySingle<UserModel>(SQLConstants.get_employees_for_admin_query, new { EMAIL = Email });
+                    UserModel user = connection.QuerySingle<UserModel>(SQLConstants.get_employees_by_email_query, new { EMAIL = Email });
                     users.Add(user);
                     var details = connection.Query<UserModel>(SQLConstants.get_employees_for_admin_query);
                     foreach (var detail in details)
@@ -139,5 +140,45 @@ namespace Admin.Resources
             return user;
         }
 
+        public UserModel EditEmployee(string Email)
+            {
+            UserModel userModel = new UserModel();
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    var user = connection.QuerySingle(SQLConstants.get_employees_by_email_query, new { EMAIL = Email });
+                    userModel.Name = user.NAME;
+                    userModel.Email = user.EMAIL;
+                    userModel.Phone = user.PHONE;
+                    userModel.Role = user.ROLE;
+                    userModel.Manager = user.MANAGER;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.Write("Error executing query: " + ex.Message);
+                }
+            }
+            return userModel;
+        }
+
+        public bool UpdateEmployee(UserModel user)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    connection.Execute(SQLConstants.update_employee_by_email_query, new { NAME = user.Name, EMAIL = user.Email, PHONE = user.Phone, ROLE = user.Role, MANAGER = user.Manager });
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

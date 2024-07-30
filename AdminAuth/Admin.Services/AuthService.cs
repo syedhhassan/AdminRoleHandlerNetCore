@@ -21,7 +21,7 @@ namespace Admin.Services
         }
 
         public bool SignUp(UserModel user)
-        {
+            {
             byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(password: user.Password!, salt: salt, prf: KeyDerivationPrf.HMACSHA256, iterationCount: 100000, numBytesRequested: 256 / 8));
             user.Salt = salt;
@@ -36,32 +36,52 @@ namespace Admin.Services
             return result;
         }
 
-        public int SignIn(UserModel user)
+        public string SignIn(UserModel user)
         {
             var user_creds = _authRepository.GetCreds(user.Email);
             byte[] user_salt = user_creds.Salt;
-            var user_role = user_creds.RoleId;
+            var user_role = user_creds.Role;
             if (user_salt != null)
             {
                 string user_hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(password: user.Password!, salt: user_salt, prf: KeyDerivationPrf.HMACSHA256, iterationCount: 100000, numBytesRequested: 256 / 8));
                 if (user_hashed == user_creds.PasswordHash)
                 {
-                    return Convert.ToInt32(user_role);
+                    return user_role;
                 }
                 else
                 {
-                    return 0;
+                    return "_";
                 }
             }
             else
             {
-                return 0;
+                return "_";
             }
+        }
+
+        public UserModel GetEmployeeByEmail(string Email)
+        {
+            return _authRepository.GetEmployeeByEmail(Email);
         }
 
         public List<UserModel> GetEmployeesByManager(string Email)
         {
             return _authRepository.GetEmployeesByManager(Email);
+        }
+
+        public List<UserModel> GetEmployeesForAdmin(string Email)
+        {
+            return _authRepository.GetEmployeesForAdmin(Email);
+        }
+
+        public UserModel EditEmployee(string Email)
+        {
+            return _authRepository.EditEmployee(Email);
+        }
+
+        public bool UpdateEmployee(UserModel user)
+        {
+            return _authRepository.UpdateEmployee(user);
         }
     }
 }

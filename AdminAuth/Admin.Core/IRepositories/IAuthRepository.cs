@@ -10,7 +10,8 @@ namespace Admin.Core.IRepositories
     public interface IAuthRepository
     {
         public bool SignUp(UserModel user);
-
+        public UserModel GetCreds(string Email);
+        
         public List<string> GetManagers();
 
         public List<UserModel> GetEmployeesByManager(string Email);
@@ -19,6 +20,8 @@ namespace Admin.Core.IRepositories
 
         public UserModel GetEmployeeByEmail(string Email);
 
-        public UserModel GetCreds(string Email);
+        public UserModel EditEmployee(string Email);
+
+        public bool UpdateEmployee(UserModel user);
     }
 }

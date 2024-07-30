@@ -1,0 +1,32 @@
+﻿@model Admin.Core.Models.UserModel;
+<div class="row">
+    <div class="card col-3 mb-3 box-shadow shadow" style="padding:0">
+        <div class="card-header">
+            <strong>@Model.Role</strong>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li style="list-style-type:none;"><div class="card-text"><strong>@Model.Name</strong></div></li>
+                <li style="list-style-type:none;"><div class="card-text">@Model.Email</div></li>
+                <li style="list-style-type:none;"><div class="card-text">@Model.Phone</div></li>
+                <li style="list-style-type:none;"><div class="card-text">@Model.Role</div></li>
+                <li style="list-style-type:none;"><div class="card-text">@Model.Manager</div></li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-1"></div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var message = '@TempData["ToastrMessage"]';
+        var type = '@TempData["ToastrType"]';
+        if (message !== "") {
+            toastr.options = {
+                progressBar: true,
+                positionClass: 'toast-top-right'
+            };
+            toastr[type](message);
+        }
+    });
+</script>
