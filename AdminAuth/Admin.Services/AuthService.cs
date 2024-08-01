@@ -36,64 +36,147 @@ namespace Admin.Services
         }
         #endregion
 
+        #region Checking for duplicate entry
+        /// <summary>
+        /// Checking for duplicate entry
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public bool CheckDuplicate(UserModel user)
         {
             return _authRepository.CheckDuplicate(user);
         }
+        #endregion
 
+
+        #region Get roles for sign up
+        /// <summary>
+        /// Get roles for sign up
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetRoles()
+        {
+            List<string> result = new List<string>();
+            result = _authRepository.GetRoles();
+            return result;
+        }
+        #endregion
+
+        #region Get managers for sign up
+        /// <summary>
+        /// Getting managers for sign up
+        /// </summary>
+        /// <returns></returns>
         public List<string> GetManagers()
         {
             List<string> result = new List<string>();
             result = _authRepository.GetManagers();
             return result;
         }
+        #endregion
 
-        public string SignIn(UserModel user)
+        #region Sign In
+        /// <summary>
+        /// Sign In
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public List<string> SignIn(UserModel user)
         {
+            List<string> details = new List<string>();
             var user_creds = _authRepository.GetCreds(user.Email);
             byte[] user_salt = user_creds.Salt;
-            var user_role = user_creds.Role;
             if (user_salt != null)
             {
                 string user_hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(password: user.Password!, salt: user_salt, prf: KeyDerivationPrf.HMACSHA256, iterationCount: 100000, numBytesRequested: 256 / 8));
                 if (user_hashed == user_creds.PasswordHash)
                 {
-                    return user_role;
+                    details.Add(user_creds.Name);
+                    details.Add(user_creds.Role);
+                    return details;
                 }
                 else
                 {
-                    return "_";
+                    return [];
                 }
             }
             else
             {
-                return "_";
+                return [];
             }
         }
+        #endregion
 
+        #region Get an employee by email
+        /// <summary>
+        /// Get an employee by email
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
         public UserModel GetEmployeeByEmail(string Email)
         {
             return _authRepository.GetEmployeeByEmail(Email);
         }
+        #endregion
 
+        #region Get employees by their manager
+        /// <summary>
+        /// Get employees by their manager
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
         public List<UserModel> GetEmployeesByManager(string Email)
         {
             return _authRepository.GetEmployeesByManager(Email);
         }
+        #endregion
 
+        #region Get all employees for admin
+        /// <summary>
+        /// Get all employees for admin
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
         public List<UserModel> GetEmployeesForAdmin(string Email)
         {
             return _authRepository.GetEmployeesForAdmin(Email);
         }
+        #endregion
 
+        #region Edit Employee
+        /// <summary>
+        /// Edit Employee
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
         public UserModel EditEmployee(string Email)
         {
             return _authRepository.EditEmployee(Email);
         }
+        #endregion
 
+        #region Update Employee
+        /// <summary>
+        /// Update Employee
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public bool UpdateEmployee(UserModel user)
         {
             return _authRepository.UpdateEmployee(user);
         }
+        #endregion
+
+        #region Deleting an employee
+        /// <summary>
+        /// Deleting an employee
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
+        public bool DeleteEmployee(string Email)
+        {
+            return _authRepository.DeleteEmployee(Email);
+        }
+        #endregion
     }
 }

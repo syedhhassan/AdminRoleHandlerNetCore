@@ -1,4 +1,6 @@
-﻿<h2 class="text-center">Sign Up</h2>
+﻿@model Admin.Core.Models.UserModel;
+
+<h2 class="text-center">Sign Up</h2>
 <div class="container col-6">
     @using (Html.BeginForm("SignUp", "Account", FormMethod.Post, new { @id = "SignUp", @class = "form-control bg-light shadow-lg" }))
     {
@@ -43,7 +45,7 @@
         <div class="row mb-3">
             <label class="col-2 ml-2"><strong>Role<span class="text-danger">*</span></strong></label>
             <div class="col-10 mr-2">
-                @Html.DropDownList("Role", new SelectList(GetRoles(), "Value", "Text"), "Select", new { id = "Role", @class = "form-control" })
+                @Html.DropDownList("Manager", new SelectList((IEnumerable<string>)TempData["Roles"]), "Select", new { id = "Role", @class = "form-control" })
                 <label class="error text-danger" for="Role"></label>
             </div>
         </div>
@@ -80,6 +82,13 @@
                 </div>
             </div>
         </div>
+        <div class="row mb-3">
+            <label class="col-2 ml-2"><strong>Address<span class="text-danger">*</span></strong></label>
+            <div class="col-10 mr-2">
+                @Html.TextArea("Address", "", new { @class = "form-control", @id = "Address"})
+                <label class="error text-danger" for="Address"></label>
+            </div>
+        </div>
         <div class="form-group text-center mt-2 mb-3">
             <button type="submit" class="btn btn-primary col-3 text-center" id="submit">Sign Up</button>
         </div>
@@ -104,6 +113,16 @@
 @section Scripts{
     <script>
         $(document).ready(function () {
+            var message = '@TempData["ToastrMessage"]';
+            var type = '@TempData["ToastrType"]';
+            if (message !== "") {
+                toastr.options = {
+                    progressBar: true,
+                    positionClass: 'toast-top-right'
+                };
+                toastr[type](message);
+            }
+
             $('#Phone').mask('000-0000-000');
 
             $('#Role').on('click', function () {
@@ -181,7 +200,8 @@
                         required: true
                     },
                     Password: {
-                        required: true
+                        required: true,
+                        minlength: 8
                     },
                     CPassword: {
                         required: true,
@@ -211,7 +231,8 @@
                         required: "Select your manager"
                     },
                     Password: {
-                        required: "Password is a required field"
+                        required: "Password is a required field",
+                        minlength: "Password should be atleast 8 characters"
                     },
                     CPassword: {
                         required: "Re-enter your password",

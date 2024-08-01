@@ -10,12 +10,18 @@ using Admin.Core.Models;
 using System.Security.Cryptography.X509Certificates;
 using Admin.Core.Utilities;
 using System.Reflection.Metadata;
+using Microsoft.Extensions.Configuration;
 
 namespace Admin.Resources
 {
     public class AuthRepository : IAuthRepository
     {
-        public string connectionString = "Server=13.127.44.211;Database=Express990_TraningDB;User Id=Express_dev_user;Password=Dev@2024;";
+        private readonly string _connectionstring;
+
+        public AuthRepository(IConfiguration configuration)
+        {
+            _connectionstring = configuration.GetConnectionString("DefaultConnection");
+        }
 
         #region Sign Up
         /// <summary>
@@ -25,7 +31,7 @@ namespace Admin.Resources
         /// <returns></returns>
         public bool SignUp(UserModel user)
         {           
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(_connectionstring))
             {
                 try
                 {
@@ -50,7 +56,7 @@ namespace Admin.Resources
         /// <returns></returns>
         public bool CheckDuplicate(UserModel user)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(_connectionstring))
             {
                 try
                 {
@@ -68,6 +74,30 @@ namespace Admin.Resources
         }
         #endregion
 
+        #region Get roles for sign up drop down
+        /// <summary>
+        /// Get roles for sign up drop down
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetRoles()
+        {
+            List<string> result = new List<string>();
+            using (SqlConnection connection = new SqlConnection(_connectionstring))
+            {
+                try
+                {
+                    connection.Open();
+                    result = connection.Query<string>(SQLConstants.get_roles_query).ToList();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                }
+            }
+            return result;
+        }
+        #endregion
+
         #region Get Managers for Sign Up dropdown
         /// <summary>
         /// Get Managers for Sign Up dropdown
@@ -76,7 +106,7 @@ namespace Admin.Resources
         public List<string> GetManagers()
         {
             List<string> result = new List<string>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(_connectionstring))
             {
                 try
                 {
@@ -101,19 +131,20 @@ namespace Admin.Resources
         public UserModel GetCreds(string Email)
         {
             UserModel user = new UserModel();
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(_connectionstring))
             {
                 try
                 {
                     connection.Open();
                     var creds = connection.QuerySingle(SQLConstants.get_creds_query, new { EMAIL = Email });
+                    user.Name = creds.NAME;
                     user.Salt = creds.SALT;
                     user.PasswordHash = creds.PASSWORDHASH;
-                    user.Role = Convert.ToString(creds.ROLE);
+                    user.Role = creds.ROLE;
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    System.Diagnostics.Debug.WriteLine(ex.Message);                    
                 }
                 return user;
             }
@@ -129,7 +160,7 @@ namespace Admin.Resources
         public List<UserModel> GetEmployeesByManager(string Email)
         {
             List<UserModel> users = new List<UserModel>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(_connectionstring))
             {
                 try
                 {
@@ -160,7 +191,7 @@ namespace Admin.Resources
         public List<UserModel> GetEmployeesForAdmin(string Email)
         {
             List<UserModel> users = new List<UserModel>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(_connectionstring))
             {
                 try
                 {
@@ -191,7 +222,7 @@ namespace Admin.Resources
         public UserModel GetEmployeeByEmail(string Email)
         {
             UserModel user = new UserModel();
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(_connectionstring))
             {
                 try
                 {
@@ -216,7 +247,7 @@ namespace Admin.Resources
         public UserModel EditEmployee(string Email)
             {
             UserModel userModel = new UserModel();
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(_connectionstring))
             {
                 try
                 {
@@ -245,12 +276,12 @@ namespace Admin.Resources
         /// <returns></returns>
         public bool UpdateEmployee(UserModel user)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(_connectionstring))
             {
                 try
                 {
                     connection.Open();
-                    connection.Execute(SQLConstants.update_employee_by_email_query, new { NAME = user.Name, EMAIL = user.Email, PHONE = user.Phone, ROLE = user.Role, MANAGER = user.Manager });
+                    connection.Execute(SQLConstants.update_employee_by_email_query, new { NAME = user.Name, EMAIL = user.Email, PHONE = user.Phone, MANAGER = user.Manager });
                 }
                 catch (Exception ex)
                 {
@@ -262,5 +293,24 @@ namespace Admin.Resources
         }
         #endregion
 
+        #region Deleting an employee
+        public bool DeleteEmployee(string Email)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionstring))
+            {
+                try
+                {
+                    connection.Open();
+                    connection.Execute(SQLConstants.delete_employee_by_email_query, new { EMAIL = Email });
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    return false;
+                }
+            }
+            return true;
+        }
+        #endregion
     }
 }

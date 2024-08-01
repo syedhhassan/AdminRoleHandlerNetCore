@@ -12,6 +12,7 @@ namespace AdminAuth.Controllers
         {
             _authService = authService;
         }
+
         #region Sign Up
         /// <summary>
         /// Sign Up
@@ -20,6 +21,7 @@ namespace AdminAuth.Controllers
         public IActionResult SignUp()
         {
             HttpContext.Session.Clear();
+            TempData["Roles"] = _authService.GetRoles();
             TempData["Managers"] = _authService.GetManagers();
             return View();
         }
@@ -34,16 +36,17 @@ namespace AdminAuth.Controllers
         [HttpPost]
         public IActionResult SignUp(UserModel user)
         {
-            if (_authService.CheckDuplicate(user))
+            if (_authService.SignUp(user))
             {
-                _authService.SignUp(user);
+                TempData["ToastrMessage"] = "Signed up successfully. You can sign in.";
+                TempData["ToastrType"] = "success";
                 return RedirectToAction("Index", "Home");
             }
             else
             {
                 TempData["ToastrMessage"] = "Email already exists. Please Sign In";
                 TempData["ToastrType"] = "warning";
-                return View(user);
+                return RedirectToAction("SignUp", user);
             }           
         }
         #endregion
@@ -69,20 +72,26 @@ namespace AdminAuth.Controllers
         public IActionResult SignIn(UserModel user)
         {
             var value = _authService.SignIn(user);
-            if (value != "_")
+            if (value.Count != 0)
             {
                 HttpContext.Session.SetString("Email", user.Email);
-                HttpContext.Session.SetString("Role", value);
-                if (value == "Admin")
+                HttpContext.Session.SetString("Role", value[1]);
+                if (value[1] == "Admin")
                 {
+                    TempData["ToastrMessage"] = $"Hi {value[0]}";
+                    TempData["ToastrType"] = "success";
                     return RedirectToAction("AdminDashboard");
                 }
-                else if (value == "Manager")
+                else if (value[1] == "Manager")
                 {
+                    TempData["ToastrMessage"] = $"Hi {value[0]}";
+                    TempData["ToastrType"] = "success";
                     return RedirectToAction("ManagerDashboard");
                 }
-                else if (value == "Team Member")
+                else if (value[1] == "Team Member")
                 {
+                    TempData["ToastrMessage"] = $"Hi {value[0]}";
+                    TempData["ToastrType"] = "success";
                     return RedirectToAction("UserDashboard");
                 }
                 else
@@ -112,8 +121,6 @@ namespace AdminAuth.Controllers
             var sessionrole = HttpContext.Session.GetString("Role");
             if (sessionemail != null && sessionrole == "Admin")
             {
-                TempData["ToastrMessage"] = "Hi Admin!";
-                TempData["ToastrType"] = "success";
                 List<UserModel> users = _authService.GetEmployeesForAdmin(sessionemail);
                 return View(users);
             }
@@ -137,8 +144,6 @@ namespace AdminAuth.Controllers
             var sessionrole = HttpContext.Session.GetString("Role");
             if (sessionemail != null && sessionrole == "Manager")
             {
-                TempData["ToastrMessage"] = "Hi Manager!";
-                TempData["ToastrType"] = "success";
                 List<UserModel> users = _authService.GetEmployeesByManager(sessionemail);
                 return View(users);
             }
@@ -162,8 +167,6 @@ namespace AdminAuth.Controllers
             var sessionrole = HttpContext.Session.GetString("Role");
             if (sessionemail != null && sessionrole == "Team Member")
             {
-                TempData["ToastrMessage"] = "Hi User!";
-                TempData["ToastrType"] = "success";
                 UserModel users = _authService.GetEmployeeByEmail(sessionemail);
                 return View(users);
             }
@@ -184,6 +187,7 @@ namespace AdminAuth.Controllers
         /// <returns></returns>
         public IActionResult EditEmployee(string Email)
         {
+            TempData["Roles"] = _authService.GetRoles();
             TempData["Managers"] = _authService.GetManagers();
             UserModel user = _authService.EditEmployee(Email);
             return View("EditEmployee", user);
@@ -224,6 +228,53 @@ namespace AdminAuth.Controllers
                 TempData["ToastrType"] = "error";
                 return RedirectToAction("EditEmployee");
             }
+        }
+        #endregion
+
+        #region Soft delete employee by email
+        /// <summary>
+        /// Soft delete employee by email
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
+        public IActionResult DeleteEmployee(string Email)
+        {
+            var sessionrole = HttpContext.Session.GetString("Role");
+            if (_authService.DeleteEmployee(Email))
+            {
+                TempData["ToastrMessage"] = "Employee deleted successfully!";
+                TempData["ToastrType"] = "warning";
+                if (sessionrole == "Admin")
+                {
+                    return RedirectToAction("AdminDashboard");
+                }
+                else if (sessionrole == "Manager")
+                {
+                    return RedirectToAction("ManagerDashboard");
+                }
+                else
+                {
+                    return RedirectToAction("UserDashboard");
+                }
+            }
+            else
+            {
+                TempData["ToastrMessage"] = "Failed to delete employee.";
+                TempData["ToastrType"] = "error";
+                if (sessionrole == "Admin")
+                {
+                    return RedirectToAction("AdminDashboard");
+                }
+                else if (sessionrole == "Manager")
+                {
+                    return RedirectToAction("ManagerDashboard");
+                }
+                else
+                {
+                    return RedirectToAction("UserDashboard");
+                }
+            }
+
         }
         #endregion
 

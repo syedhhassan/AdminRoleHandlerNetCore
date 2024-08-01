@@ -13,6 +13,8 @@ namespace Admin.Core.IServices
 
         public bool CheckDuplicate(UserModel user);
 
+        public List<string> GetRoles();
+
         public List<string> GetManagers();
 
         public UserModel GetEmployeeByEmail(string Email);
@@ -21,11 +23,13 @@ namespace Admin.Core.IServices
 
         public List<UserModel> GetEmployeesByManager(string Email);
 
-        public string SignIn(UserModel user);
+        public List<string> SignIn(UserModel user);
 
         public UserModel EditEmployee(string Email);
 
         public bool UpdateEmployee(UserModel user);
+
+        public bool DeleteEmployee(string Email);
 
     }
 }

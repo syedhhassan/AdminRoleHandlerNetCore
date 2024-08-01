@@ -26,5 +26,7 @@ namespace Admin.Core.Models
 
         public string? Manager { get; set; }
 
+        public string? Address { get; set; }
+
     }
 }

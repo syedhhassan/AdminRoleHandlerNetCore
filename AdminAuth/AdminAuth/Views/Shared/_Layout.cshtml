@@ -36,7 +36,7 @@
                     @if (ViewContext.RouteData.Values["action"].ToString() != "SignIn" && ViewContext.RouteData.Values["action"].ToString() != "SignUp" && ViewContext.RouteData.Values["action"].ToString() != "Index" && ViewContext.RouteData.Values["action"].ToString() != "Privacy")
                     {
                         <li class="nav-item" id="Logout">
-                            <a class="nav-link text-dark position-absolute top-0 end-0">
+                            <a class="nav-link text-dark position-absolute top-0 end-0" asp-controller="Account" asp-action="Logout">
                                 <img src="https://www.spanplan.com/images/exit.png" alt="" style="cursor:pointer;">
                             </a>
                         </li>

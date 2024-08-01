@@ -13,6 +13,8 @@ namespace Admin.Core.IRepositories
 
         public bool CheckDuplicate(UserModel user);
 
+        public List<string> GetRoles();
+
         public List<string> GetManagers();
 
         public UserModel GetCreds(string Email);        
@@ -26,5 +28,7 @@ namespace Admin.Core.IRepositories
         public UserModel EditEmployee(string Email);
 
         public bool UpdateEmployee(UserModel user);
+
+        public bool DeleteEmployee(string Email);
     }
 }
