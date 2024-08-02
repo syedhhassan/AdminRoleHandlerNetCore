@@ -122,6 +122,7 @@ namespace AdminAuth.Controllers
             if (sessionemail != null && sessionrole == "Admin")
             {
                 List<UserModel> users = _authService.GetEmployeesForAdmin(sessionemail);
+                TempData["employeeCount"] = users.Count - 1;
                 return View(users);
             }
             else
@@ -145,6 +146,7 @@ namespace AdminAuth.Controllers
             if (sessionemail != null && sessionrole == "Manager")
             {
                 List<UserModel> users = _authService.GetEmployeesByManager(sessionemail);
+                TempData["employeeCount"] = users.Count - 1;
                 return View(users);
             }
             else
