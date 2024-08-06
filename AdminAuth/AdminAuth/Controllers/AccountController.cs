@@ -18,6 +18,7 @@ namespace AdminAuth.Controllers
         /// Sign Up
         /// </summary>
         /// <returns></returns>
+        //[Route("Register")]
         public IActionResult SignUp()
         {
             HttpContext.Session.Clear();
@@ -56,6 +57,7 @@ namespace AdminAuth.Controllers
         /// Sign In
         /// </summary>
         /// <returns></returns>
+        //[Route("Login")]
         public IActionResult SignIn()
         {
             return View();
@@ -115,6 +117,7 @@ namespace AdminAuth.Controllers
         /// Dashboard for Admin
         /// </summary>
         /// <returns></returns>
+        //[Route("Dashboard")]
         public IActionResult AdminDashboard()
         {
             var sessionemail = HttpContext.Session.GetString("Email");
@@ -139,6 +142,7 @@ namespace AdminAuth.Controllers
         /// Dashboard for Manager
         /// </summary>
         /// <returns></returns>
+        //[Route("Dashboard")]
         public IActionResult ManagerDashboard()
         {
             var sessionemail = HttpContext.Session.GetString("Email");
@@ -163,6 +167,7 @@ namespace AdminAuth.Controllers
         /// Dashboard for User
         /// </summary>
         /// <returns></returns>
+        //[Route("Dashboard")]
         public IActionResult UserDashboard()
         {
             var sessionemail = HttpContext.Session.GetString("Email");
@@ -187,6 +192,7 @@ namespace AdminAuth.Controllers
         /// </summary>
         /// <param name="Email"></param>
         /// <returns></returns>
+        //[Route("Edit")]
         public IActionResult EditEmployee(string Email)
         {
             TempData["Roles"] = _authService.GetRoles();

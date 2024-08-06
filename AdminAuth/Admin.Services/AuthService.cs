@@ -48,7 +48,6 @@ namespace Admin.Services
         }
         #endregion
 
-
         #region Get roles for sign up
         /// <summary>
         /// Get roles for sign up
