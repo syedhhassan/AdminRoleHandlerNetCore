@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Admin.Core\Admin.Core.csproj" />
-    <ProjectReference Include="..\Admin.Resources\Admin.Resources.csproj" />
-    <ProjectReference Include="..\Admin.Services\Admin.Services.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>

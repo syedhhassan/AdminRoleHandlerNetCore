@@ -13,12 +13,20 @@ namespace Admin.Services
 {
     public class AuthService : IAuthService
     {
+        #region Declaration
+
         private readonly IAuthRepository _authRepository;
+
+        #endregion
+
+        #region Constructor
 
         public AuthService(IAuthRepository authRepository)
         {
             _authRepository = authRepository;
         }
+
+        #endregion
 
         #region Sign Up
         /// <summary>
@@ -74,6 +82,17 @@ namespace Admin.Services
         }
         #endregion
 
+        #region Get roles and managers for sign up
+        /// <summary>
+        /// Get details for sign up
+        /// </summary>
+        /// <returns></returns>
+        public List<List<string>> GetDetails()
+        {
+            return _authRepository.GetDetails();
+        }
+        #endregion
+
         #region Sign In
         /// <summary>
         /// Sign In
@@ -86,8 +105,9 @@ namespace Admin.Services
             var user_creds = _authRepository.GetCreds(user.Email);
             byte[] user_salt = user_creds.Salt;
             if (user_salt != null)
-            {
+            {              
                 string user_hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(password: user.Password!, salt: user_salt, prf: KeyDerivationPrf.HMACSHA256, iterationCount: 100000, numBytesRequested: 256 / 8));
+                //Comparing hash values
                 if (user_hashed == user_creds.PasswordHash)
                 {
                     details.Add(user_creds.Name);
