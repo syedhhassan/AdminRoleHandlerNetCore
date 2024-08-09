@@ -1,29 +1,40 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Admin.Core.Models;
-using Admin.Core.IServices;
+using AdminAuth.Models;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace AdminAuth.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IAuthService _authService;
-
-        public AccountController(IAuthService authService)
-        {
-            _authService = authService;
-        }
-
         #region Sign Up
         /// <summary>
         /// Sign Up
         /// </summary>
         /// <returns></returns>
         //[Route("Register")]
-        public IActionResult SignUp()
+        [HttpGet]
+        public async Task<ActionResult> SignUp()
         {
-            HttpContext.Session.Clear();
-            TempData["Roles"] = _authService.GetRoles();
-            TempData["Managers"] = _authService.GetManagers();
+            List<List<string>> details = new List<List<string>>();
+
+            using (HttpClient client = new HttpClient())
+            {
+                string requestUrl = $"https://localhost:7122/api/AccountAPI/details";
+                var response = await client.GetAsync(requestUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    details = JsonConvert.DeserializeObject<List<List<string>>>(responseString);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+            TempData["Roles"] = details[0];
+            TempData["Managers"] = details[1];
             return View();
         }
         #endregion
@@ -35,20 +46,30 @@ namespace AdminAuth.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult SignUp(UserModel user)
+        public async Task<ActionResult> SignUp(UserModel user)
         {
-            if (_authService.SignUp(user))
+            using (HttpClient client = new HttpClient())
             {
-                TempData["ToastrMessage"] = "Signed up successfully. You can sign in.";
-                TempData["ToastrType"] = "success";
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                TempData["ToastrMessage"] = "Email already exists. Please Sign In";
-                TempData["ToastrType"] = "warning";
-                return RedirectToAction("SignUp", user);
-            }           
+                string requestUrl = $"https://localhost:7122/api/AccountAPI/signup";
+                var jsonContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync(requestUrl, jsonContent);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    //var responseString = await response.Content.ReadAsStringAsync();
+                    //var responseData = JsonConvert.DeserializeObject<dynamic>(responseString);
+                    TempData["ToastrMessage"] = "Signed up successfully. You can sign in.";
+                    TempData["ToastrType"] = "success";
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    TempData["ToastrMessage"] = "Email already exists. Please Sign In";
+                    TempData["ToastrType"] = "warning";
+                    return RedirectToAction("SignUp", user);
+                }
+            }       
         }
         #endregion
 
@@ -71,30 +92,30 @@ namespace AdminAuth.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult SignIn(UserModel user)
+        public async Task<ActionResult> SignIn(UserModel user)
         {
-            var value = _authService.SignIn(user);
-            if (value.Count != 0)
+            List<string> details = new List<string>();
+            using (HttpClient client = new HttpClient())
             {
-                HttpContext.Session.SetString("Email", user.Email);
-                HttpContext.Session.SetString("Role", value[1]);
-                if (value[1] == "Admin")
+                string requestUrl = $"https://localhost:7122/api/AccountAPI/signin";
+                var jsonContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(requestUrl, jsonContent);
+                if (response.IsSuccessStatusCode)
                 {
-                    TempData["ToastrMessage"] = $"Hi {value[0]}";
-                    TempData["ToastrType"] = "success";
-                    return RedirectToAction("AdminDashboard");
-                }
-                else if (value[1] == "Manager")
-                {
-                    TempData["ToastrMessage"] = $"Hi {value[0]}";
-                    TempData["ToastrType"] = "success";
-                    return RedirectToAction("ManagerDashboard");
-                }
-                else if (value[1] == "Team Member")
-                {
-                    TempData["ToastrMessage"] = $"Hi {value[0]}";
-                    TempData["ToastrType"] = "success";
-                    return RedirectToAction("UserDashboard");
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    details = JsonConvert.DeserializeObject<List<string>>(responseString);
+                    if (details.Count != 0 && user.Email != null)
+                    {
+                        HttpContext.Session.SetString("Email", user.Email);
+                        HttpContext.Session.SetString("Role", details[1]);
+                        return RedirectToAction("Dashboard");
+                    }
+                    else
+                    {
+                        TempData["ToastrMessage"] = "Sign in failed!";
+                        TempData["ToastrType"] = "error";
+                        return View();
+                    }
                 }
                 else
                 {
@@ -103,86 +124,49 @@ namespace AdminAuth.Controllers
                     return View();
                 }
             }
+        }
+        #endregion
+
+        #region Employee Dashboard
+        /// <summary>
+        /// Dashboard
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult> Dashboard()
+        {
+            List<UserModel> users = new List<UserModel>();
+            var sessionemail = HttpContext.Session.GetString("Email");
+            var sessionrole = HttpContext.Session.GetString("Role");
+
+            if (sessionemail != null && sessionrole != null)
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    string requestUrl = $"https://localhost:7122/api/AccountAPI/userdetails?Email={sessionemail}&Role={sessionrole}";
+                    var response = await client.GetAsync(requestUrl);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        users = JsonConvert.DeserializeObject<List<UserModel>>(responseString);
+                        TempData["employeeCount"] = users.Count - 1;
+                    }
+                    else
+                    {
+                        TempData["ToastrMessage"] = "Denied!";
+                        TempData["ToastrType"] = "error";
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+            }
             else
             {
-                TempData["ToastrMessage"] = "Sign in failed!";
+                TempData["ToastrMessage"] = "Denied!";
                 TempData["ToastrType"] = "error";
-                return View();
+                return RedirectToAction("Index", "Home");
             }
-        }
-        #endregion
-
-        #region Dashboard for Admin
-        /// <summary>
-        /// Dashboard for Admin
-        /// </summary>
-        /// <returns></returns>
-        //[Route("Dashboard")]
-        public IActionResult AdminDashboard()
-        {
-            var sessionemail = HttpContext.Session.GetString("Email");
-            var sessionrole = HttpContext.Session.GetString("Role");
-            if (sessionemail != null && sessionrole == "Admin")
-            {
-                List<UserModel> users = _authService.GetEmployeesForAdmin(sessionemail);
-                TempData["employeeCount"] = users.Count - 1;
-                return View(users);
-            }
-            else
-            {
-                TempData["ToastrMessage"] = "Sign in as Admin!";
-                TempData["ToastrType"] = "warning";
-                return RedirectToAction("SignIn");
-            }
-        }
-        #endregion
-
-        #region Dashboard for Manager
-        /// <summary>
-        /// Dashboard for Manager
-        /// </summary>
-        /// <returns></returns>
-        //[Route("Dashboard")]
-        public IActionResult ManagerDashboard()
-        {
-            var sessionemail = HttpContext.Session.GetString("Email");
-            var sessionrole = HttpContext.Session.GetString("Role");
-            if (sessionemail != null && sessionrole == "Manager")
-            {
-                List<UserModel> users = _authService.GetEmployeesByManager(sessionemail);
-                TempData["employeeCount"] = users.Count - 1;
-                return View(users);
-            }
-            else
-            {
-                TempData["ToastrMessage"] = "Sign in as Manager!";
-                TempData["ToastrType"] = "warning";
-                return RedirectToAction("SignIn");
-            }
-        }
-        #endregion
-
-        #region Dashboard for User
-        /// <summary>
-        /// Dashboard for User
-        /// </summary>
-        /// <returns></returns>
-        //[Route("Dashboard")]
-        public IActionResult UserDashboard()
-        {
-            var sessionemail = HttpContext.Session.GetString("Email");
-            var sessionrole = HttpContext.Session.GetString("Role");
-            if (sessionemail != null && sessionrole == "Team Member")
-            {
-                UserModel users = _authService.GetEmployeeByEmail(sessionemail);
-                return View(users);
-            }
-            else
-            {
-                TempData["ToastrMessage"] = "Sign in first!";
-                TempData["ToastrType"] = "warning";
-                return RedirectToAction("SignIn");
-            }
+            return View(users);
         }
         #endregion
 
@@ -193,11 +177,26 @@ namespace AdminAuth.Controllers
         /// <param name="Email"></param>
         /// <returns></returns>
         //[Route("Edit")]
-        public IActionResult EditEmployee(string Email)
+        [HttpGet]
+        public async Task<ActionResult> EditEmployee(string Email)
         {
-            TempData["Roles"] = _authService.GetRoles();
-            TempData["Managers"] = _authService.GetManagers();
-            UserModel user = _authService.EditEmployee(Email);
+            UserModel user = new UserModel();
+
+            using (HttpClient client = new HttpClient())
+            {
+                string requestUrl = $"https://localhost:7122/api/AccountAPI/getuser?Email={Email}";
+                var response = await client.GetAsync(requestUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    user = JsonConvert.DeserializeObject<UserModel>(responseString);
+                }
+                else
+                {
+                    return RedirectToAction("Dashboard");
+                }
+            }
             return View("EditEmployee", user);
         }
         #endregion
@@ -209,32 +208,29 @@ namespace AdminAuth.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Update(UserModel user)
+        public async Task<ActionResult> Update(UserModel user)
         {
-            var sessionrole = HttpContext.Session.GetString("Role");
-
-            if (_authService.UpdateEmployee(user))
+            using (HttpClient client = new HttpClient())
             {
-                TempData["ToastrMessage"] = $"Employee {user.Name} updated successfully!";
-                TempData["ToastrType"] = "success";
-                if (sessionrole == "Admin")
+                string requestUrl = $"https://localhost:7122/api/AccountAPI/update";
+                var jsonContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+
+                var response = await client.PutAsync(requestUrl, jsonContent);
+
+                if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToAction("AdminDashboard");
-                }
-                else if (sessionrole == "Manager")
-                {
-                    return RedirectToAction("ManagerDashboard");
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    var responseData = JsonConvert.DeserializeObject<dynamic>(responseString);
+                    TempData["ToastrMessage"] = $"Employee {user.Name} updated successfully!";
+                    TempData["ToastrType"] = "success";
+                    return RedirectToAction("Dashboard");
                 }
                 else
                 {
-                    return RedirectToAction("UserDashboard");
+                    TempData["ToastrMessage"] = "Failed to update employee.";
+                    TempData["ToastrType"] = "error";
+                    return RedirectToAction("EditEmployee", user);
                 }
-            }
-            else
-            {
-                TempData["ToastrMessage"] = "Failed to update employee.";
-                TempData["ToastrType"] = "error";
-                return RedirectToAction("EditEmployee");
             }
         }
         #endregion
@@ -245,44 +241,31 @@ namespace AdminAuth.Controllers
         /// </summary>
         /// <param name="Email"></param>
         /// <returns></returns>
-        public IActionResult DeleteEmployee(string Email)
+        [HttpGet]
+        public async Task<ActionResult> DeleteEmployee(string Email)
         {
-            var sessionrole = HttpContext.Session.GetString("Role");
-            if (_authService.DeleteEmployee(Email))
+            using (HttpClient client = new HttpClient())
             {
-                TempData["ToastrMessage"] = "Employee deleted successfully!";
-                TempData["ToastrType"] = "warning";
-                if (sessionrole == "Admin")
-                {
-                    return RedirectToAction("AdminDashboard");
-                }
-                else if (sessionrole == "Manager")
-                {
-                    return RedirectToAction("ManagerDashboard");
-                }
-                else
-                {
-                    return RedirectToAction("UserDashboard");
-                }
-            }
-            else
-            {
-                TempData["ToastrMessage"] = "Failed to delete employee.";
-                TempData["ToastrType"] = "error";
-                if (sessionrole == "Admin")
-                {
-                    return RedirectToAction("AdminDashboard");
-                }
-                else if (sessionrole == "Manager")
-                {
-                    return RedirectToAction("ManagerDashboard");
-                }
-                else
-                {
-                    return RedirectToAction("UserDashboard");
-                }
-            }
+                string requestUrl = $"https://localhost:7122/api/AccountAPI/delete?Email={Email}";
+                var jsonContent = new StringContent(JsonConvert.SerializeObject(Email), Encoding.UTF8, "application/json");
 
+                var response = await client.PutAsync(requestUrl, jsonContent);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["ToastrMessage"] = "Employee deleted successfully!";
+                    TempData["ToastrType"] = "warning";
+                    //var responseString = await response.Content.ReadAsStringAsync();
+                    //var responseData = JsonConvert.DeserializeObject<dynamic>(responseString);
+                    return RedirectToAction("Dashboard");
+                }
+                else
+                {
+                    TempData["ToastrMessage"] = "Failed to delete employee.";
+                    TempData["ToastrType"] = "error";
+                    return RedirectToAction("Dashbboard");
+                }
+            }
         }
         #endregion
 

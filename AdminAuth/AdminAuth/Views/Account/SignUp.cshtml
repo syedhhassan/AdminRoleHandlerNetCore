@@ -1,4 +1,4 @@
-﻿@model Admin.Core.Models.UserModel;
+﻿@model AdminAuth.Models.UserModel;
 
 <h2 class="text-center">Sign Up</h2>
 <div class="container col-6">
@@ -45,7 +45,7 @@
         <div class="row mb-3">
             <label class="col-2 ml-2"><strong>Role<span class="text-danger">*</span></strong></label>
             <div class="col-10 mr-2">
-                @Html.DropDownList("Manager", new SelectList((IEnumerable<string>)TempData["Roles"]), "Select", new { id = "Role", @class = "form-control" })
+                @Html.DropDownList("Role", new SelectList((IEnumerable<string>)TempData["Roles"]), "Select", new { id = "Role", @class = "form-control" })
                 <label class="error text-danger" for="Role"></label>
             </div>
         </div>

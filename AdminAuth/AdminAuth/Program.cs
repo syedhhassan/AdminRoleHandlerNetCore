@@ -1,18 +1,9 @@
-using Admin.Core.IRepositories;
-using Admin.Core.IServices;
-using Admin.Resources;
-using Admin.Services;
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddSession();
-
-builder.Services.AddTransient<IAuthRepository, AuthRepository>();
-builder.Services.AddTransient<IAuthService, AuthService>();
 
 var app = builder.Build();
 

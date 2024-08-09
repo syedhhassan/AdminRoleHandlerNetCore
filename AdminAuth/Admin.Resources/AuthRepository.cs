@@ -16,12 +16,20 @@ namespace Admin.Resources
 {
     public class AuthRepository : IAuthRepository
     {
+        #region Declaration
+
         private readonly string _connectionstring;
+
+        #endregion
+
+        #region Constructor
 
         public AuthRepository(IConfiguration configuration)
         {
             _connectionstring = configuration.GetConnectionString("DefaultConnection");
         }
+
+        #endregion
 
         #region Sign Up
         /// <summary>
@@ -122,6 +130,31 @@ namespace Admin.Resources
         }
         #endregion
 
+        #region Get roles and managers for sign up
+        /// <summary>
+        /// Get roles and managers for sign up
+        /// </summary>
+        /// <returns></returns>
+        public List<List<string>> GetDetails()
+        {
+            List<List<string>> details = new List<List<string>>();
+            using (SqlConnection connection = new SqlConnection(_connectionstring))
+            {
+                try
+                {
+                    connection.Open();
+                    details.Add(connection.Query<string>(SQLConstants.get_roles_query).ToList());
+                    details.Add(connection.Query<string>(SQLConstants.get_managers_query).ToList());
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                }
+            }
+            return details;
+        }
+        #endregion
+
         #region Getting credentials for signing in
         /// <summary>
         /// Getting credentials for signing in
@@ -165,7 +198,7 @@ namespace Admin.Resources
                 try
                 {
                     connection.Open();    
-                    UserModel user = connection.QuerySingle<UserModel>(SQLConstants.get_employees_by_email_query, new { EMAIL = Email });
+                    UserModel user = connection.QuerySingle<UserModel>(SQLConstants.get_employee_by_email_query, new { EMAIL = Email });
                     users.Add(user);
                     var details = connection.Query<UserModel>(SQLConstants.get_employees_by_manager_query, new { EMAIL = Email }).ToList();
                     foreach (var detail in details)
@@ -196,7 +229,7 @@ namespace Admin.Resources
                 try
                 {
                     connection.Open();
-                    UserModel user = connection.QuerySingle<UserModel>(SQLConstants.get_employees_by_email_query, new { EMAIL = Email });
+                    UserModel user = connection.QuerySingle<UserModel>(SQLConstants.get_employee_by_email_query, new { EMAIL = Email });
                     users.Add(user);
                     var details = connection.Query<UserModel>(SQLConstants.get_employees_for_admin_query);
                     foreach (var detail in details)
@@ -227,7 +260,7 @@ namespace Admin.Resources
                 try
                 {
                     connection.Open();
-                    user = connection.QuerySingle<UserModel>(SQLConstants.get_employees_by_email_query, new { EMAIL = Email });
+                    user = connection.QuerySingle<UserModel>(SQLConstants.get_employee_by_email_query, new { EMAIL = Email });
                 }
                 catch (Exception ex)
                 {
@@ -252,12 +285,13 @@ namespace Admin.Resources
                 try
                 {
                     connection.Open();
-                    var user = connection.QuerySingle(SQLConstants.get_employees_by_email_query, new { EMAIL = Email });
+                    var user = connection.QuerySingle(SQLConstants.get_employee_by_email_query, new { EMAIL = Email });
                     userModel.Name = user.NAME;
                     userModel.Email = user.EMAIL;
                     userModel.Phone = user.PHONE;
                     userModel.Role = user.ROLE;
                     userModel.Manager = user.MANAGER;
+                    userModel.Address = user.ADDRESS;
                 }
                 catch (Exception ex)
                 {

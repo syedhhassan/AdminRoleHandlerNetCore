@@ -3,15 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminAuth", "AdminAuth\AdminAuth.csproj", "{C1E1D579-46D9-43B4-B363-0D2B3F8ACF8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdminAuth", "AdminAuth\AdminAuth.csproj", "{C1E1D579-46D9-43B4-B363-0D2B3F8ACF8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Core", "Admin.Core\Admin.Core.csproj", "{E6F89F78-4C8C-4E1A-8EAD-9A9BF11BEAAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Admin.Core", "Admin.Core\Admin.Core.csproj", "{E6F89F78-4C8C-4E1A-8EAD-9A9BF11BEAAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Resources", "Admin.Resources\Admin.Resources.csproj", "{1F0FB775-2B65-499D-B380-CE74C591CE66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Admin.Resources", "Admin.Resources\Admin.Resources.csproj", "{1F0FB775-2B65-499D-B380-CE74C591CE66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Services", "Admin.Services\Admin.Services.csproj", "{0B559F98-0A0C-424F-85C0-15B1B624886C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Admin.Services", "Admin.Services\Admin.Services.csproj", "{0B559F98-0A0C-424F-85C0-15B1B624886C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Class Libraries", "Class Libraries", "{09F7245C-7C1A-4903-8C30-639B562B1EAD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{2347DA68-62CA-46BE-9528-2CB230C7EFC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminAPI", "AdminAPI\AdminAPI.csproj", "{12592A9D-6D81-4A35-96B5-5C8D48C4E1F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +39,10 @@ Global
 		{0B559F98-0A0C-424F-85C0-15B1B624886C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B559F98-0A0C-424F-85C0-15B1B624886C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B559F98-0A0C-424F-85C0-15B1B624886C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12592A9D-6D81-4A35-96B5-5C8D48C4E1F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12592A9D-6D81-4A35-96B5-5C8D48C4E1F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12592A9D-6D81-4A35-96B5-5C8D48C4E1F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12592A9D-6D81-4A35-96B5-5C8D48C4E1F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -43,6 +51,7 @@ Global
 		{E6F89F78-4C8C-4E1A-8EAD-9A9BF11BEAAF} = {09F7245C-7C1A-4903-8C30-639B562B1EAD}
 		{1F0FB775-2B65-499D-B380-CE74C591CE66} = {09F7245C-7C1A-4903-8C30-639B562B1EAD}
 		{0B559F98-0A0C-424F-85C0-15B1B624886C} = {09F7245C-7C1A-4903-8C30-639B562B1EAD}
+		{12592A9D-6D81-4A35-96B5-5C8D48C4E1F2} = {2347DA68-62CA-46BE-9528-2CB230C7EFC0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F2898460-8352-4EAF-8D06-25C2A44ACD80}

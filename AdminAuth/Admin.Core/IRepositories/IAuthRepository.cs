@@ -13,6 +13,8 @@ namespace Admin.Core.IRepositories
 
         public bool CheckDuplicate(UserModel user);
 
+        public List<List<string>> GetDetails();
+
         public List<string> GetRoles();
 
         public List<string> GetManagers();

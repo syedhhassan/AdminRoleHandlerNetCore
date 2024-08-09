@@ -1,0 +1,81 @@
+﻿@model List<AdminAuth.Models.UserModel>
+<h2>Welcome @Model[0].Name!</h2>
+@if (Model[0].Role == "Admin" || Model[0].Role == "Manager")
+{
+    <h5><img src="https://cdn-icons-png.flaticon.com/512/1769/1769041.png" alt="" width="35" height="35" /> @TempData["employeeCount"] employees</h5>
+}
+<div class="row">
+    <div class="card col-3 mb-3 box-shadow shadow" style="padding:0">
+        <div class="card-header">
+            <strong>@Model[0].Role</strong>
+            @if (Model[0].Role == "Admin")
+            {
+                <span class="position-absolute end-0 pe-3">
+                    <a asp-controller="Account" asp-action="EditEmployee" asp-route-Email=@Model[0].Email class="text-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
+                            <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z" />
+                        </svg>
+                    </a>
+                </span>
+            }
+        </div>
+        <div class="card-body">
+            <div class="card-text"><strong>@Model[0].Name</strong></div>
+            <div class="card-text">@Model[0].Email</div>
+            <div class="card-text">@Model[0].Phone</div>
+            <div class="card-text">@Model[0].Role</div>
+            <div class="card-text">@Model[0].Manager</div>
+        </div>
+    </div>
+
+    <div class="row">
+        @for (int i = 1; i < Model.Count; i++)
+        {
+            <div class="card col-3 mb-3 box-shadow shadow" style="padding:0">
+                <div class="card-header">
+                    <strong>@Model[i].Role</strong>
+                        @if (Model[0].Role == "Admin" || Model[0].Role == "Manager")
+                        {
+                            <span class="position-absolute end-0 pe-3">
+                                <a asp-controller="Account" asp-action="EditEmployee" asp-route-Email=@Model[i].Email class="text-info">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
+                                        <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z" />
+                                    </svg>
+                                </a>
+                            @if (Model[i].Role != "Manager")
+                            {
+                                <a asp-controller="Account" asp-action="DeleteEmployee" asp-route-Email=@Model[i].Email class="text-danger">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                                        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+                                    </svg>
+                                </a>
+                            }
+                        </span>
+                        }
+                </div>
+                <div class="card-body">
+                    <div class="card-text"><strong>@Model[i].Name</strong></div>
+                    <div class="card-text">@Model[i].Email</div>
+                    <div class="card-text">@Model[i].Phone</div>
+                    <div class="card-text">@Model[i].Role</div>
+                    <div class="card-text">@Model[i].Manager</div>
+                </div>
+            </div>
+            <div class="col-1"></div>
+        }
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            var message = '@TempData["ToastrMessage"]';
+            var type = '@TempData["ToastrType"]';
+            if (message !== "") {
+                toastr.options = {
+                    progressBar: true,
+                    positionClass: 'toast-top-right'
+                };
+                toastr[type](message);
+            }
+        });
+    </script>

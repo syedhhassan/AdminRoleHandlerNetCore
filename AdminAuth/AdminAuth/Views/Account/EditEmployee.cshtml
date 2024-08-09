@@ -1,4 +1,4 @@
-﻿@model Admin.Core.Models.UserModel;
+﻿@model AdminAuth.Models.UserModel;
 <h2 class="text-center">Edit Employee</h2>
 <div class="container col-6">
     @using (Html.BeginForm("Update", "Account", FormMethod.Post, new { @id = "Update", @class = "form-control bg-light shadow-lg" }))
@@ -27,38 +27,15 @@
         <div class="row mb-3">
             <label class="col-2 ml-2"><strong>Role<span class="text-danger">*</span></strong></label>
             <div class="col-10 mr-2">
-                @Html.DropDownListFor(m => m.Role, new SelectList((IEnumerable<string>)TempData["Roles"]), "Select", new { id = "Role", @class = "form-control" })
+                @Html.TextBoxFor(m => m.Role, new { @class = "form-control", @id = "Role", @oninput = "this.value=(this.value.match('[A-Z a-z]+'))", maxlength = 50, @readonly = "readonly" })
                 <label class="error text-danger" for="Role"></label>
-            </div>
-        </div>
-        <div id="AdminPass" style="display:none">
-            <div class="row mb-3">
-                <label class="col-2 ml-2"><strong>Admin Password<span class="text-danger">*</span></strong></label>
-                <div class="col-10 mr-2">
-                    @Html.TextBox("APassword", "", new { @class = "form-control", @id = "APassword", @oninput = "this.value=(this.value.match('[A-Za-z0-9_]+'))", maxlength = 50, @type = "password" })
-                    @Html.CheckBox("ShowAPass", new { @class = "form-check-input", @id = "ShowAPass" })
-                    <span class="form-check-label">Show password</span>
-                    <label class="error text-danger col-12" for="Password"></label>
-                </div>
-            </div>
-        </div>
-        <div id="ManagerPass" style="display:none">
-            <div class="row mb-3">
-                <label class="col-2 ml-2"><strong>Manager Password<span class="text-danger">*</span></strong></label>
-                <div class="col-10 mr-2">
-                    @Html.TextBox("MPassword", "", new { @class = "form-control", @id = "MPassword", @oninput = "this.value=(this.value.match('[A-Za-z0-9_]+'))", maxlength = 50, @type = "password" })
-                    @Html.CheckBox("ShowMPass", new { @class = "form-check-input", @id = "ShowMPass" })
-                    <span class="form-check-label">Show password</span>
-                    <br />
-                    <label class="error text-danger" for="Password"></label>
-                </div>
             </div>
         </div>
         <div id="ManagerName" style="display:none">
             <div class="row mb-3">
                 <label class="col-2"><strong>Manager<span class="text-danger">*</span></strong></label>
                 <div class="col-10">
-                    @Html.DropDownListFor(m => m.Manager, new SelectList((IEnumerable<string>)TempData["Managers"]), "Select", new { id = "Role", @class = "form-control" })
+                    @Html.TextBoxFor(m => m.Manager, new { @class = "form-control", @id = "Manager", @oninput = "this.value=(this.value.match('[A-Z a-z]+'))", maxlength = 50, @readonly = "readonly" })
                     <label class="error text-danger" for="Role"></label>
                 </div>
             </div>
@@ -76,70 +53,16 @@
     }
 </div>
 
-@functions {
-    public static List<SelectListItem> GetRoles()
-    {
-        return new List<SelectListItem>
-            {
-                new SelectListItem { Value = "Admin", Text = "Admin" },
-                new SelectListItem { Value = "Manager", Text = "Manager" },
-                new SelectListItem { Value = "Team Member", Text = "Team Member" },
-            };
-    }
-    }
 @section Scripts {
     <script>
         $(document).ready(function () {
             $('#Phone').mask('000-0000-000');
-
-            $('#Role').on('click', function () {
-                if ($('#Role').val() == "Admin") {
-                    $('#APassword').css("display", "block")
-                    $('#APassword').css("display", "none")
-                    $('#ManagerName').css("display", "none")
-                }
-                else if ($('#Role').val() == "Manager") {
-                    $('#APassword').css("display", "none")
-                    $('#APassword').css("display", "block")
-                    $('#ManagerName').css("display", "none")
-                }
-                else {
-                    $('#APassword').css("display", "none")
-                    $('#APassword').css("display", "none")
-                    $('#ManagerName').css("display", "block")
-                }
-
-            });
-
-            $('#ShowPass').on('click', function () {
-                var x = document.getElementById("Password");
-                if (x.type === "password") {
-                    x.type = "text";
-                }
-                else {
-                    x.type = "password";
-                }
-            });
-
-            $('#ShowAPass').on('click', function () {
-                var x = document.getElementById("APassword");
-                if (x.type === "password") {
-                    x.type = "text";
-                }
-                else {
-                    x.type = "password";
-                }
-            });
-
-            $('#ShowMPass').on('click', function () {
-                var x = document.getElementById("MPassword");
-                if (x.type === "password") {
-                    x.type = "text";
-                }
-                else {
-                    x.type = "password";
-                }
-            });
+            if ($('#Role').val() == "Team Member") {
+                $('#ManagerName').css("display", "block")
+            }
+            else {
+                $('#ManagerName').css("display", "none")
+            }
 
             $("#Update").validate({
                 rules: {
